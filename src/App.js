@@ -91,6 +91,7 @@ export default function App() {
   function handleDeleteWatched(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
+
   useEffect(
     function () {
       const controller = new AbortController();
@@ -123,6 +124,8 @@ export default function App() {
         setError("");
         return;
       }
+
+      handleCloseMovie();
       fetchMovies();
 
       return function () {
@@ -284,7 +287,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const [userRating, setUserRating] = useState("");
 
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
-  console.log(isWatched);
+  // console.log(isWatched);
 
   const watchedUserRating = watched.find(
     (movie) => movie.imdbID === selectedId
@@ -339,6 +342,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     function () {
       if (!title) return;
       document.title = `Movie | ${title}`;
+      // Cleanup function
       return function () {
         document.title = "usePopcorn";
         console.log(`Cleanup function for movie ${title}`);
@@ -347,6 +351,21 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     [title]
   );
 
+  function callback(e) {
+    if (e.key === "Escape") {
+      onCloseMovie();
+    }
+  }
+  useEffect(
+    function () {
+      document.addEventListener("keydown", callback);
+
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [onCloseMovie]
+  );
   return (
     <div className="details">
       {isLoading ? (
