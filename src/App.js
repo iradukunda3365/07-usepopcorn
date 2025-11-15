@@ -167,7 +167,11 @@ function Search({ query, setQuery }) {
   const inputEl = useRef(null);
 
   useEffect(function () {
-    inputEl.current.focus();
+    function callBack(e){
+
+      inputEl.current.focus();
+    }
+    return ()=> document.addEventListener("keydown" , callBack)
   }, []);
 
   // useEffect(function () {
