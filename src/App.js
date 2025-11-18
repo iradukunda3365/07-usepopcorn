@@ -113,19 +113,19 @@ function Logo() {
 function Search({ query, setQuery }) {
   const inputEl = useRef(null);
 
-  useEffect(
-    function () {
-      function callBack(e) {
-        if (document.activeElement === inputEl.current) return;
-        if (e.code === "Enter") {
-          inputEl.current.focus();
-          setQuery("");
-        }
+  useEffect(() => {
+    function callBack(e) {
+      if (document.activeElement === inputEl.current) return;
+      if (e.code === "Enter") {
+        inputEl.current.focus();
+        setQuery("");
       }
-      return () => document.addEventListener("keydown", callBack);
-    },
-    [setQuery]
-  );
+    }
+
+    document.addEventListener("keydown", callBack);
+
+    return () => document.removeEventListener("keydown", callBack);
+  }, [setQuery]);
 
   // useEffect(function () {
   //   const el = document.querySelector(".search");
@@ -370,10 +370,19 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
 //   );
 // }
 
-function WatchedSummary({ watched }) {
-  const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
-  const avgUserRating = average(watched.map((movie) => movie.userRating));
-  const avgRuntime = average(watched.map((movie) => movie.runtime));
+function WatchedSummary({ watched = [] }) {
+  const avgImdbRating = watched.length
+    ? average(watched.map((movie) => movie.imdbRating))
+    : 0;
+
+  const avgUserRating = watched.length
+    ? average(watched.map((movie) => movie.userRating))
+    : 0;
+
+  const avgRuntime = watched.length
+    ? average(watched.map((movie) => movie.runtime))
+    : 0;
+
   return (
     <div className="summary">
       <h2>Movies you watched</h2>
@@ -399,8 +408,8 @@ function WatchedSummary({ watched }) {
   );
 }
 
-function WatchedMoviesList({ watched, onDeleteWatched }) {
 
+function WatchedMoviesList({ watched, onDeleteWatched }) {
   return (
     <ul className="list">
       {watched.map((movie) => (
